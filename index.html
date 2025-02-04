@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markdown to HTML Converter</title>
+  <title>Markdown to HTML + CSS + Export</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,14 +24,14 @@
       border: 1px solid #ddd;
       border-radius: 5px;
       padding: 10px;
-      background: white;
       font-family: monospace;
+      background: white;
     }
     textarea {
       resize: vertical;
     }
     pre {
-      background: #f4f4f4;
+      background: white; /* Converted HTML is now white */
       padding: 10px;
       border-radius: 5px;
       white-space: pre-wrap;
@@ -38,34 +41,51 @@
       border: 1px solid #ccc;
       padding: 15px;
       background: #fff;
-      width: 80%;
+      width: 210mm; /* A4 width */
+      min-height: 297mm; /* A4 height */
+      box-sizing: border-box;
+    }
+    .export-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    select, button {
+      padding: 8px 12px;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>Markdown to HTML + CSS Editor</h1>
+  <h1>Markdown to HTML + CSS + Export</h1>
 
-  <!-- Markdown Input -->
   <h3>Markdown Input</h3>
   <textarea id="markdownInput" placeholder="Paste your Markdown here..."></textarea>
 
-  <!-- HTML Output -->
   <h3>Converted HTML</h3>
   <pre id="htmlOutput">Converted HTML will appear here...</pre>
 
-  <!-- CSS Input -->
   <h3>Custom CSS</h3>
   <textarea id="cssInput" placeholder="Write custom CSS here..."></textarea>
 
-  <!-- Rendered HTML -->
   <h3>Rendered Output</h3>
   <div id="renderedOutput"></div>
+
+  <div class="export-container">
+    <select id="exportType">
+      <option value="pdf">Export as PDF</option>
+      <option value="png">Export as PNG</option>
+    </select>
+    <button onclick="exportOutput()">Download</button>
+  </div>
 
   <script>
     const markdownInput = document.getElementById('markdownInput');
     const htmlOutput = document.getElementById('htmlOutput');
     const renderedOutput = document.getElementById('renderedOutput');
     const cssInput = document.getElementById('cssInput');
+    const exportType = document.getElementById('exportType');
 
     const styleTag = document.createElement('style');
     document.head.appendChild(styleTag);
@@ -74,14 +94,47 @@
     cssInput.addEventListener('input', updateCSS);
 
     function updateOutput() {
-      const markdownText = markdownInput.value;
-      const htmlContent = marked.parse(markdownText);
-      htmlOutput.textContent = htmlContent; // Show raw HTML
-      renderedOutput.innerHTML = htmlContent; // Render the HTML visually
+      let markdownText = markdownInput.value;
+      
+      // Remove zero-width characters
+      markdownText = markdownText.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "");
+
+      // Convert Markdown to HTML and sanitize it
+      let htmlContent = DOMPurify.sanitize(marked.parse(markdownText));
+
+      htmlOutput.textContent = htmlContent; // Show raw HTML safely
+      renderedOutput.innerHTML = htmlContent; // Render safe HTML
     }
 
     function updateCSS() {
-      styleTag.textContent = cssInput.value; // Apply user-written CSS
+      styleTag.textContent = cssInput.value;
+    }
+
+    function exportOutput() {
+      const selectedFormat = exportType.value;
+      
+      if (selectedFormat === 'png') {
+        html2canvas(renderedOutput, { scale: 2 }).then(canvas => {
+          const link = document.createElement('a');
+          link.href = canvas.toDataURL('image/png');
+          link.download = 'rendered_output.png';
+          link.click();
+        });
+      } else if (selectedFormat === 'pdf') {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          format: 'a4',
+          orientation: 'portrait'
+        });
+
+        html2canvas(renderedOutput, { scale: 2 }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const imgWidth = 210; // A4 width in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          doc.save('rendered_output.pdf');
+        });
+      }
     }
   </script>
 </body>
