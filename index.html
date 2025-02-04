@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown to HTML Converter</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: #f9f9f9;
+    }
+    textarea, pre, div {
+      width: 80%;
+      min-height: 150px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      background: white;
+      font-family: monospace;
+    }
+    textarea {
+      resize: vertical;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    #renderedOutput {
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: #fff;
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Markdown to HTML + CSS Editor</h1>
+
+  <!-- Markdown Input -->
+  <h3>Markdown Input</h3>
+  <textarea id="markdownInput" placeholder="Paste your Markdown here..."></textarea>
+
+  <!-- HTML Output -->
+  <h3>Converted HTML</h3>
+  <pre id="htmlOutput">Converted HTML will appear here...</pre>
+
+  <!-- CSS Input -->
+  <h3>Custom CSS</h3>
+  <textarea id="cssInput" placeholder="Write custom CSS here..."></textarea>
+
+  <!-- Rendered HTML -->
+  <h3>Rendered Output</h3>
+  <div id="renderedOutput"></div>
+
+  <script>
+    const markdownInput = document.getElementById('markdownInput');
+    const htmlOutput = document.getElementById('htmlOutput');
+    const renderedOutput = document.getElementById('renderedOutput');
+    const cssInput = document.getElementById('cssInput');
+
+    const styleTag = document.createElement('style');
+    document.head.appendChild(styleTag);
+
+    markdownInput.addEventListener('input', updateOutput);
+    cssInput.addEventListener('input', updateCSS);
+
+    function updateOutput() {
+      const markdownText = markdownInput.value;
+      const htmlContent = marked.parse(markdownText);
+      htmlOutput.textContent = htmlContent; // Show raw HTML
+      renderedOutput.innerHTML = htmlContent; // Render the HTML visually
+    }
+
+    function updateCSS() {
+      styleTag.textContent = cssInput.value; // Apply user-written CSS
+    }
+  </script>
+</body>
+</html>
