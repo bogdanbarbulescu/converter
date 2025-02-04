@@ -62,12 +62,14 @@
 
   <h3>Markdown Input</h3>
   <textarea id="markdownInput" placeholder="Paste your Markdown here..."></textarea>
+  <button onclick="insertExampleMarkdown()">Insert Example</button>
 
   <h3>Converted HTML</h3>
   <pre id="htmlOutput">Converted HTML will appear here...</pre>
 
   <h3>Custom CSS</h3>
   <textarea id="cssInput" placeholder="Write custom CSS here..."></textarea>
+  <button onclick="insertExampleCSS()">Insert Example</button>
 
   <h3>Rendered Output</h3>
   <div id="renderedOutput"></div>
@@ -136,6 +138,15 @@
         });
       }
     }
+        function insertExampleMarkdown() {
+        markdownInput.value = "# Sample Markdown\n\nThis is a **bold** text and this is an *italic* text.\n\n- Item 1\n- Item 2\n- Item 3\n\n[Click Here](https://example.com)";
+        updateOutput();
+      }
+  
+      function insertExampleCSS() {
+        cssInput.value = "h1 { color: darkblue; text-align: center; }";
+        updateCSS();
+      }
   </script>
 </body>
 </html>
