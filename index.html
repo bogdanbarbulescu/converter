@@ -103,11 +103,18 @@
 
         <!-- Card Converted HTML (cu evidențiere sintaxă) -->
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-dark text-white">Converted HTML</div>
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span>Converted HTML</span>
+                <div class="d-flex align-items-center">
+                    <button id="copyButton" class="btn btn-outline-warning" onclick="copyToClipboard()">Copy</button>
+                    <span id="copyMessage" class="text-success ms-2" style="display: none;">Copied!</span>
+                </div>
+            </div>
             <div class="card-body">
                 <pre><code id="htmlOutput" class="html">Converted HTML will appear here...</code></pre>
             </div>
         </div>
+
 
         <!-- Card Custom CSS -->
         <div class="card shadow-sm mb-4">
@@ -230,6 +237,19 @@
             markdownInput.value = "# Sample Markdown\n\nAcesta este un **text îngroșat** și acesta este un *text italic*.\n\n```javascript\n// Exemplu de cod JavaScript\nfunction saluta() {\n  console.log('Salut lume!');\n}\n```\n\n- Element A\n- Element B\n- Element C\n\n![Exemplu Imagine](https://via.placeholder.com/300x200)\n\n[Vizitează Exemplul](https://example.com)";
             updateOutput();
         }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(htmlOutput.textContent).then(() => {
+                const copyMessage = document.getElementById('copyMessage');
+                copyMessage.style.display = 'inline';
+
+                setTimeout(() => {
+                    copyMessage.style.display = 'none';
+                }, 2000);
+            });
+        }
+
+
 
         // Inserează CSS exemplu pentru stilizare
         function insertExampleCSS() {
